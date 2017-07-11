@@ -1,0 +1,7 @@
+syntax: glob
+__pychache__
+build
+dist
+pythonenv
+*.egg-info
+*.sqlite3
