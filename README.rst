@@ -6,17 +6,16 @@ djaTeX
 Description
 -----------
 
-This project contains a python module named djatex which allows a
+This project provides a python module named djatex which allows a
 django app to generate a PDF document from a LaTeX template file.
 
 |
 Example
 --------
 
-An example django project is provided, which generates a one-page
-PDF document in the LaTeX article style.
+A small django project is included, with an example django app that generates a one-page PDF document in the LaTeX article style.
 
-To view the example, run the following commands::
+To set up the example server, run the following commands::
 
    $ python3 -m venv pythonenv
    $ source pythonenv/bin/activate
