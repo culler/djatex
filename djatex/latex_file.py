@@ -13,7 +13,7 @@ class LaTeXFile:
     latex_args = ['pdflatex', '-file-line-error', '-halt-on-error', 'source']
     
     def __init__(self, latex_source, bibtex_source=None):
-        self.result = self.bib_result = None
+        self.latex_result = self.bib_result = None
         self.latex_source = latex_source
         if isinstance(latex_source, str):
             self.latex_source = self.latex_source.encode('utf8')
@@ -35,33 +35,42 @@ class LaTeXFile:
             pdf_path = os.path.join(tempdir, 'source.pdf')
             with open(tex_path, 'wb') as output:
                 output.write(self.latex_source)
-            result = run(self.latex_args, cwd=tempdir, timeout=30,
+            latex_result = run(self.latex_args, cwd=tempdir, timeout=30,
                          stdout=PIPE, stderr=PIPE)
-            if result.returncode == 0 and self.bibtex_source:
+            if latex_result.returncode == 0 and self.bibtex_source:
                 with open(bibtex_path, 'wb') as output:
                     output.write(self.bibtex_source)
                 self.bib_result = run(['bibtex', 'source'], cwd=tempdir, timeout=30,
                                       stdout=PIPE, stderr=PIPE)
-                result = run(self.latex_args, cwd=tempdir, timeout=30,
+                latex_result = run(self.latex_args, cwd=tempdir, timeout=30,
                              stdout=PIPE, stderr=PIPE)
-            if result.returncode == 0 and result.stdout.find(self.rerun) >= 0:
-                result = run(self.latex_args, cwd=tempdir, timeout=30,
+            if latex_result.returncode == 0 and latex_result.stdout.find(self.rerun) >= 0:
+                latex_result = run(self.latex_args, cwd=tempdir, timeout=30,
                              stdout=PIPE, stderr=PIPE)
-            self.result = result
+            self.latex_result = latex_result
             with open(log_path, 'r') as log:
                 self.log = log.read()
-            if result.returncode == 0:
+            if latex_result.returncode == 0:
                 with open(pdf_path, 'rb') as pdf:
                     self.pdf = pdf.read()
             else:
                 self.pdf = None
 
     def errors(self):
-        error_dict = {}
-        if self.result and self.result.returncode:
-            error_dict['pdflatex'] = self.result.stdout
-        if self.bib_result and self.bib_result.returncode:
-            error_dict['bibtex'] = self.bib_result.stdout
+        if self.latex_result.returncode:
+            error_dict = {
+                'stage': 'latex',
+                'source': [line for line in self.latex_source.split(b'\n')],
+                'output': [line for line in self.latex_result.stdout.split(b'\n')]
+            }
+        elif self.bib_result and self.bib_result.returncode:
+            error_dict = {
+                'stage': 'bibtex',
+                'source': [line for line in self.bibtex_source.split(b'\n')],
+                'output': [line for line in self.bib_result.stdout.split(b'\n')]
+            }
+        else:
+            error_dict = None
         return error_dict
 
 test_latex = r"""

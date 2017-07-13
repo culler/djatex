@@ -10,12 +10,14 @@ def index(request):
         if form.is_valid():
             author = form.cleaned_data['author']
             title = form.cleaned_data['title']
-            context={
+            form_context={
                 'form': form,
                 'author': author,
                 'title': title
             }
-            return render_latex('testfile.pdf', 'testapp/test.tex', context=context)
+            return render_latex(request, 'testfile.pdf', 'testapp/test.tex',
+                                error_template_name='testapp/error.html',
+                                context=form_context)
     else:
         form = ArticleForm()
         context = {'form': form}
