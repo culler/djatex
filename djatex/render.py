@@ -6,6 +6,25 @@ from django.template.loader import get_template
 def render_latex(request, filename, template_name,
                  error_template_name=None, bib_template_name=None,
                  context=None):
+    """
+    This shortcut function accepts a LaTeX template file and returns an HttpResponse.
+    If the LaTeX compiles without error, the response will have content_type
+    application/pdf and the content data will be the PDF rendering of the LaTeX source.
+    The filename argument is the name of the PDF file.
+
+    If the optional bib_template_name is provided that the LaTeX will be compiled with
+    the usual pdflatex bibtex pdflatex pdflatex drill.  Otherwise, pdflatex will be run
+    once and, if the output specifies undefined references, a second time.
+
+    If there are errors then the response returned by this function will be either
+    a Server Error if no error_template_name is provided.  If an error_template_name
+    is provided then that template will be rendered with a context dictionary
+    having three keys.  The first, named 'stage' has value either 'latex' or 'bibtex'
+    and specifies which TeX executable failed.  The other two, 'output' and 'source'
+    contain the stdout of the TeX executable and the input LaTeX or BibTex.  The
+    values are lists of strings, to enable the error template to display the results
+    with the same line breaks, possibly including line numbers.
+    """ 
     template = get_template(template_name)
     source = template.render(context).encode('utf8')
     if bib_template_name:

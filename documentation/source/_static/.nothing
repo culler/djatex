@@ -1,0 +1,3 @@
+This file is a placeholder since there are not static files.  Mercurial won't include
+empty directories in a repository and sphinx complains if the _static directory does
+not exist.
