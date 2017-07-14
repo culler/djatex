@@ -32,7 +32,7 @@ def render_latex(request, filename, template_name,
     application/pdf and the content data will be the PDF rendering of the LaTeX source.
     The filename argument is the name of the PDF file.
 
-    If the optional bib_template_name is provided that the LaTeX will be compiled with
+    If the optional bib_template_name is provided then the LaTeX will be compiled with
     the usual pdflatex bibtex pdflatex pdflatex drill.  Otherwise, pdflatex will be run
     once and, if the output specifies undefined references, a second time.
 
