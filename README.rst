@@ -19,7 +19,6 @@ To set up the example server, run the following commands::
 
    $ python3 -m venv pythonenv
    $ source pythonenv/bin/activate
-   $ pip install django
    $ python setup.py install
    $ cd example
    $ python manage.py migrate

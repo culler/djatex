@@ -3,6 +3,8 @@ __pycache__
 build
 dist
 pythonenv
+documentation/html
+documentation/doctrees
 *.pyc
 *.egg-info
 *.sqlite3
