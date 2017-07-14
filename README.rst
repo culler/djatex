@@ -1,6 +1,7 @@
 ======
 djaTeX
 ======
+
 |
 
 Description
@@ -10,6 +11,7 @@ This project provides a python module named djatex which allows a
 django app to generate a PDF document from a LaTeX template file.
 
 |
+
 Example
 --------
 

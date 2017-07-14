@@ -21,7 +21,13 @@
 from setuptools import setup, Command
 from codecs import open
 from subprocess import check_call
-import os, shutil
+import os, sys, shutil
+
+try:
+    assert sys.version_info.major == 3 and sys.version_info.minor >= 5
+except AssertionError:
+    print('Please use Python >= 3.5.')
+    sys.exit()
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -50,13 +56,16 @@ class Release(Command):
         check_call([python, 'setup.py', 'bdist_wheel'])
         check_call([python, 'setup.py', 'sdist'])
 
+from djatex import __version__
+
 setup(
     name='djatex',
-    version='1.0.0',
+    version=__version__,
     description='Generate pdf from latex in django',
     long_description=long_description,
     url='https://bitbucket.org/marc_culler/djatex',
     author='Marc Culler',
+    author_email='mcbugs000@gmail.com',
     license='GPL',
     classifiers=[
         'Development Status :: 4 - Beta',
