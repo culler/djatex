@@ -8,7 +8,7 @@ djaTeX Documentation
 
    module
 
-Indexes
+Index
 -------   
 
 * :ref:`genindex`
