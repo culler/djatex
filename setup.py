@@ -43,10 +43,6 @@ class Release(Command):
     def run(self):
         python = 'python3'
         
-        if os.path.exists('build'):
-            shutil.rmtree('build')
-        if os.path.exists('dist'):
-            shutil.rmtree('dist')
         html = os.path.join('documentation', 'html')
         for dir in ['build', 'dist', html]:
             if os.path.exists(dir):
