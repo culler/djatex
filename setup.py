@@ -34,6 +34,9 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open(os.path.join(here, 'djatex', 'version.py'), encoding='ascii') as f:
+    exec(f.read())
+
 class Release(Command):
     user_options = []
     def initialize_options(self):
@@ -51,8 +54,6 @@ class Release(Command):
         check_call([python, 'setup.py', 'build_sphinx'])
         check_call([python, 'setup.py', 'bdist_wheel'])
         check_call([python, 'setup.py', 'sdist'])
-
-from djatex import __version__
 
 setup(
     name='djatex',
