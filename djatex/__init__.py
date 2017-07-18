@@ -21,5 +21,5 @@
 from .latex_file import LaTeXFile, test_latex, test_bibtex
 from .render import render_latex
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 __all__ = ['LaTeXFile', 'render_latex']
