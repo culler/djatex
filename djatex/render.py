@@ -25,7 +25,7 @@ from django.template.loader import get_template
 
 def render_latex(request, filename, template_name,
                  error_template_name=None, bib_template_name=None,
-                 context=None):
+                 home_dir=None, context=None):
     """
     This shortcut function accepts a LaTeX template file and returns an HttpResponse.
     If the LaTeX compiles without error, the response will have content_type
@@ -35,6 +35,11 @@ def render_latex(request, filename, template_name,
     If the optional bib_template_name is provided then the LaTeX will be compiled with
     the usual pdflatex bibtex pdflatex pdflatex drill.  Otherwise, pdflatex will be run
     once and, if the output specifies undefined references, a second time.
+
+    If the optional home_dir argument is supplied it should be an absolute path to
+    a directory containing any files which are required to compile the LaTeX template.
+    These will be symlinked into the temporary compilatin directory before running
+    LaTeX.
 
     If there are errors then the response returned by this function will be either
     a Server Error if no error_template_name is provided.  If an error_template_name
@@ -52,10 +57,11 @@ def render_latex(request, filename, template_name,
         bib_source = bib_template.render(context).encode('utf8')
     else:
         bib_source = None
-    file = LaTeXFile(source, bibtex_source=bib_source)
+    file = LaTeXFile(source, bibtex_source=bib_source, home_dir=home_dir)
     file.compile()
     error_context = file.errors()
     if error_context:
+        print(error_context)
         if error_template_name:
             return render(request, error_template_name, context=error_context)
         else:
