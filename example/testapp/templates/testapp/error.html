@@ -31,6 +31,14 @@
         {% endfor %}
       </ol>
     </div>
+    <h2>LaTeX Log</h2>
+    <div class="source">
+      <ol>
+        {% for line in log %}
+        <li>{{ line }}</li>
+        {% endfor %}
+      </ol>
+    </div>
     {% elif stage == 'bibtex' %}
     <h1>BibTeX Error</h1>
     <p> There were errors in the BibTeX produced by the template for this page. </p>

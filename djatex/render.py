@@ -61,7 +61,6 @@ def render_latex(request, filename, template_name,
     file.compile()
     error_context = file.errors()
     if error_context:
-        print(error_context)
         if error_template_name:
             return render(request, error_template_name, context=error_context)
         else:

@@ -77,7 +77,7 @@ class LaTeXFile:
                 latex_result = run(self.latex_args, cwd=tempdir, timeout=30,
                              stdout=PIPE, stderr=PIPE)
             self.latex_result = latex_result
-            with open(log_path, 'r') as log:
+            with open(log_path, 'rb') as log:
                 self.log = log.read()
             if latex_result.returncode == 0:
                 with open(pdf_path, 'rb') as pdf:
@@ -90,7 +90,8 @@ class LaTeXFile:
             error_dict = {
                 'stage': 'latex',
                 'source': [line for line in self.latex_source.split(b'\n')],
-                'output': [line for line in self.latex_result.stdout.split(b'\n')]
+                'output': [line for line in self.latex_result.stdout.split(b'\n')],
+                'log': [line for line in self.log.split(b'\n')]
             }
         elif self.bib_result and self.bib_result.returncode:
             error_dict = {
