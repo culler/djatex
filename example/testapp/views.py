@@ -5,7 +5,7 @@ from django.conf import settings
 from djatex import render_latex
 from .forms import ArticleForm
 
-app_base = os.path.join(settings.BASE_DIR, 'testapp')
+app_base = os.path.abspath(os.path.join(settings.BASE_DIR, 'testapp'))
 tex_home = os.path.join(app_base, 'tex_home')
 
 def index(request):
