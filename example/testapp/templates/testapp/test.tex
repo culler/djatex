@@ -1,9 +1,9 @@
-\documentclass[11pt]{article}
+\documentclass[11pt]{article}{% load tex_tools %}{% autoescape off %}
 \begin{document}
 
 % Here are two ways to deal with curly braces, if you don't want spaces around the variable.
 \title{\relax {{ title }}}
-\author{% templatetag openbrace %}{{ author }}}
+\author{% templatetag openbrace %}{{ author|texify }}}
 \date{\today}
 \maketitle
 
@@ -16,3 +16,4 @@ $$
 \input{aninput.tex}
 
 \end{document}
+{% endautoescape %}

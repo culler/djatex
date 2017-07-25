@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class DjtexConfig(AppConfig):
-    name = 'djtex'
+class DjatexConfig(AppConfig):
+    name = 'djatex'
