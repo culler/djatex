@@ -41,14 +41,15 @@ def render_latex(request, filename, template_name,
     These will be symlinked into the temporary compilatin directory before running
     LaTeX.
 
-    If there are errors then the response returned by this function will be either
-    a Server Error if no error_template_name is provided.  If an error_template_name
-    is provided then that template will be rendered with a context dictionary
-    having three keys.  The first, named 'stage' has value either 'latex' or 'bibtex'
-    and specifies which TeX executable failed.  The other two, 'output' and 'source'
-    contain the stdout of the TeX executable and the input LaTeX or BibTex.  The
-    values are lists of strings, to enable the error template to display the results
-    with the same line breaks, possibly including line numbers.
+    If there are errors then the response returned by this function will be a
+    Server Error if no error_template_name is provided.  If an
+    error_template_name is provided then that template will be rendered with a
+    context dictionary having three keys.  The first, named 'stage' has value
+    either 'latex' or 'bibtex' and specifies which TeX executable failed.  The
+    other two, 'output' and 'source' contain the stdout of the TeX executable
+    and the input LaTeX or BibTex.  The values are lists of strings, to enable
+    the error template to display the results with the same line breaks,
+    possibly including line numbers.
     """ 
     template = get_template(template_name)
     source = template.render(context).encode('utf8')

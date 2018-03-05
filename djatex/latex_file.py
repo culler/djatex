@@ -89,15 +89,15 @@ class LaTeXFile:
         if self.latex_result.returncode:
             error_dict = {
                 'stage': 'latex',
-                'source': [line for line in self.latex_source.split(b'\n')],
-                'output': [line for line in self.latex_result.stdout.split(b'\n')],
-                'log': [line for line in self.log.split(b'\n')]
+                'source': [line.decode('utf-8') for line in self.latex_source.split(b'\n')],
+                'output': [line.decode('utf-8') for line in self.latex_result.stdout.split(b'\n')],
+                'log': [line.decode('utf8') for line in self.log.split(b'\n')]
             }
         elif self.bib_result and self.bib_result.returncode:
             error_dict = {
                 'stage': 'bibtex',
-                'source': [line for line in self.bibtex_source.split(b'\n')],
-                'output': [line for line in self.bib_result.stdout.split(b'\n')]
+                'source': [line.decode('utf-8') for line in self.bibtex_source.split(b'\n')],
+                'output': [line.decode('utf-8') for line in self.bib_result.stdout.split(b'\n')]
             }
         else:
             error_dict = None
