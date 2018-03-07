@@ -36,10 +36,17 @@ class LaTeXFile:
     rerun = b'Rerun to get cross-references right.'
     latex_args = ['xelatex', '-file-line-error', '-halt-on-error', 'source']
     
-    def __init__(self, latex_source, bibtex_source=None, home_dir=None):
+    def __init__(self, latex_source, bibtex_source=None, home_dir=None,
+                 build_dir=None, env=None ):
         self.latex_result = self.bib_result = None
         self.latex_source = latex_source
-        self.home_dir=home_dir
+        if home_dir:
+            assert os.path.isdir(home_dir)
+        self.home_dir = home_dir
+        if build_dir:
+            assert os.path.isdir(build_dir)
+        self.build_dir = build_dir
+        self.env = env
         if isinstance(latex_source, str):
             self.latex_source = self.latex_source.encode('utf8')
         elif not isinstance(latex_source, bytes):
@@ -51,39 +58,45 @@ class LaTeXFile:
             self.bibtex_source = bibtex_source.encode('utf8')
         elif not isinstance(bibtex_source, bytes):
             raise ValueError('The bibtex source must be of type str or bytes.')
-        
+
     def compile(self):
-        with tempfile.TemporaryDirectory(prefix='renderLaTeX') as tempdir:
-            tex_path = os.path.join(tempdir, 'source.tex')
-            bibtex_path = os.path.join(tempdir, 'source.bib')
-            log_path = os.path.join(tempdir, 'source.log')
-            pdf_path = os.path.join(tempdir, 'source.pdf')
-            if self.home_dir:
-                for extra_file in os.listdir(self.home_dir):
-                    os.symlink(os.path.join(self.home_dir, extra_file),
-                               os.path.join(tempdir, extra_file))
-            with open(tex_path, 'wb') as output:
-                output.write(self.latex_source)
-            latex_result = run(self.latex_args, cwd=tempdir, timeout=30,
-                         stdout=PIPE, stderr=PIPE)
-            if latex_result.returncode == 0 and self.bibtex_source:
-                with open(bibtex_path, 'wb') as output:
-                    output.write(self.bibtex_source)
-                self.bib_result = run(['bibtex', 'source'], cwd=tempdir, timeout=30,
-                                      stdout=PIPE, stderr=PIPE)
-                latex_result = run(self.latex_args, cwd=tempdir, timeout=30,
-                             stdout=PIPE, stderr=PIPE)
-            if latex_result.returncode == 0 and latex_result.stdout.find(self.rerun) >= 0:
-                latex_result = run(self.latex_args, cwd=tempdir, timeout=30,
-                             stdout=PIPE, stderr=PIPE)
-            self.latex_result = latex_result
-            with open(log_path, 'rb') as log:
-                self.log = log.read()
-            if latex_result.returncode == 0:
-                with open(pdf_path, 'rb') as pdf:
-                    self.pdf = pdf.read()
-            else:
-                self.pdf = None
+        if self.build_dir:
+            self._compile(self.build_dir)
+        else:
+            with tempfile.TemporaryDirectory(prefix='renderLaTeX') as build_dir:
+                self._compile(build_dir)
+
+    def _compile(self, build_dir):
+        tex_path = os.path.join(build_dir, 'source.tex')
+        bibtex_path = os.path.join(build_dir, 'source.bib')
+        log_path = os.path.join(build_dir, 'source.log')
+        pdf_path = os.path.join(build_dir, 'source.pdf')
+        if self.home_dir:
+            for extra_file in os.listdir(self.home_dir):
+                os.symlink(os.path.join(self.home_dir, extra_file),
+                           os.path.join(build_dir, extra_file))
+        with open(tex_path, 'wb') as output:
+            output.write(self.latex_source)
+        latex_result = run(self.latex_args, cwd=build_dir, timeout=30,
+                           stdout=PIPE, stderr=PIPE, env=self.env)
+        if latex_result.returncode == 0 and self.bibtex_source:
+            with open(bibtex_path, 'wb') as output:
+                output.write(self.bibtex_source)
+            self.bib_result = run(['bibtex', 'source'], cwd=build_dir, timeout=30,
+                                  stdout=PIPE, stderr=PIPE, env=self.env)
+            latex_result = run(self.latex_args, cwd=build_dir, timeout=30,
+                               stdout=PIPE, stderr=PIPE, env=self.env)
+        if latex_result.returncode == 0 and latex_result.stdout.find(self.rerun) >= 0:
+            latex_result = run(self.latex_args, cwd=build_dir, timeout=30,
+                               stdout=PIPE, stderr=PIPE, env=self.env)
+        self.latex_result = latex_result
+        with open(log_path, 'rb') as log:
+            self.log = log.read()
+        if latex_result.returncode == 0:
+            with open(pdf_path, 'rb') as pdf:
+                self.pdf = pdf.read()
+        else:
+            self.pdf = None
 
     def errors(self):
         if self.latex_result.returncode:

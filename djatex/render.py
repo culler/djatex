@@ -25,7 +25,7 @@ from django.template.loader import get_template
 
 def render_latex(request, filename, template_name,
                  error_template_name=None, bib_template_name=None,
-                 home_dir=None, context=None):
+                 home_dir=None, build_dir=None, env=None, context=None):
     """
     This shortcut function accepts a LaTeX template file and returns an HttpResponse.
     If the LaTeX compiles without error, the response will have content_type
@@ -33,7 +33,7 @@ def render_latex(request, filename, template_name,
     The filename argument is the name of the PDF file.
 
     If the optional bib_template_name is provided then the LaTeX will be compiled with
-    the usual pdflatex bibtex pdflatex pdflatex drill.  Otherwise, pdflatex will be run
+    the usual xelatex bibtex xelatex xelatex drill.  Otherwise, xelatex will be run
     once and, if the output specifies undefined references, a second time.
 
     If the optional home_dir argument is supplied it should be an absolute path to
@@ -58,7 +58,8 @@ def render_latex(request, filename, template_name,
         bib_source = bib_template.render(context).encode('utf8')
     else:
         bib_source = None
-    file = LaTeXFile(source, bibtex_source=bib_source, home_dir=home_dir)
+    file = LaTeXFile(source, bibtex_source=bib_source,
+                     home_dir=home_dir, build_dir=build_dir, env=env)
     file.compile()
     error_context = file.errors()
     if error_context:
