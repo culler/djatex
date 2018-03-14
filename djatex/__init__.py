@@ -19,7 +19,7 @@
 #   Author homepage: https://marc-culler.info
 
 from .latex_file import LaTeXFile, test_latex, test_bibtex
-from .render import render_latex
+from .render import render_latex, render_as_base64
 from .version import __version__
 
-__all__ = ['LaTeXFile', 'render_latex']
+__all__ = ['LaTeXFile', 'render_latex', 'render_as_base64']

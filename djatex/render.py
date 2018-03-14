@@ -22,6 +22,7 @@ from . import LaTeXFile
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import get_template
+import base64
 
 def render_latex(request, filename, template_name,
                  error_template_name=None, bib_template_name=None,
@@ -38,7 +39,7 @@ def render_latex(request, filename, template_name,
 
     If the optional home_dir argument is supplied it should be an absolute path to
     a directory containing any files which are required to compile the LaTeX template.
-    These will be symlinked into the temporary compilatin directory before running
+    These will be symlinked into the temporary compilation directory before running
     LaTeX.
 
     If there are errors then the response returned by this function will be a
@@ -50,17 +51,8 @@ def render_latex(request, filename, template_name,
     and the input LaTeX or BibTex.  The values are lists of strings, to enable
     the error template to display the results with the same line breaks,
     possibly including line numbers.
-    """ 
-    template = get_template(template_name)
-    source = template.render(context).encode('utf8')
-    if bib_template_name:
-        bib_template = get_template(bib_template_name)
-        bib_source = bib_template.render(context).encode('utf8')
-    else:
-        bib_source = None
-    file = LaTeXFile(source, bibtex_source=bib_source,
-                     home_dir=home_dir, build_dir=build_dir, env=env)
-    file.compile()
+    """
+    file = compile(template_name, bib_template_name, home_dir, build_dir, env, context)
     error_context = file.errors()
     if error_context:
         if error_template_name:
@@ -71,3 +63,27 @@ def render_latex(request, filename, template_name,
         response = HttpResponse(file.pdf, content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"'%filename
         return response
+
+def render_as_base64(request, filename, template_name,
+                   error_template_name=None, bib_template_name=None,
+                   home_dir=None, build_dir=None, env=None, context=None):
+    file = compile(template_name, bib_template_name, home_dir, build_dir, env, context)
+    error_context = file.errors()
+    if error_context:
+        return {'status': 'failure', 'filename': filename, 'data': error_context}
+    else:
+        return {'status': 'success', 'filename': filename,
+                'data': base64.encodebytes(file.pdf).decode('utf-8')}
+    
+def compile(template_name, bib_template_name, home_dir, build_dir, env, context):
+    template = get_template(template_name)
+    source = template.render(context).encode('utf8')
+    if bib_template_name:
+        bib_template = get_template(bib_template_name)
+        bib_source = bib_template.render(context).encode('utf8')
+    else:
+        bib_source = None
+    file = LaTeXFile(source, bibtex_source=bib_source,
+                     home_dir=home_dir, build_dir=build_dir, env=env)
+    file.compile()
+    return file
