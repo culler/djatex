@@ -90,9 +90,10 @@ class LaTeXFile:
             latex_result = run(self.latex_args, cwd=build_dir, timeout=30,
                                stdout=PIPE, stderr=PIPE, env=self.env)
         self.latex_result = latex_result
-        with open(log_path, 'rb') as log:
-            self.log = log.read()
-        if latex_result.returncode == 0:
+        if os.path.exists(log_path):
+            with open(log_path, 'rb') as log:
+                self.log = log.read()
+        if self.latex_result.returncode == 0 and os.path.exists(pdf_path):
             with open(pdf_path, 'rb') as pdf:
                 self.pdf = pdf.read()
         else:
