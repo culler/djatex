@@ -74,7 +74,21 @@ def render_as_base64(request, filename, template_name,
     else:
         return {'status': 'success', 'filename': filename,
                 'data': base64.encodebytes(file.pdf).decode('utf-8')}
-    
+
+def render_latex_as_data(request, filename, template_name,
+                          error_template_name=None, bib_template_name=None,
+                          home_dir=None, build_dir=None, env=None, context=None):
+    """
+    Returns a dictionary containing the raw pdf data e.g. for creating an email
+    attachment.
+    """
+    file = compile(template_name, bib_template_name, home_dir, build_dir, env, context)
+    error_context = file.errors()
+    if error_context:
+        return {'status': 'failure', 'filename': filename, 'data': error_context}
+    else:
+        return {'status': 'success', 'filename': filename, 'data': file.pdf}
+        
 def compile(template_name, bib_template_name, home_dir, build_dir, env, context):
     template = get_template(template_name)
     source = template.render(context).encode('utf8')
